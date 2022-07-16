@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>Rower</title>
+
+    <script type="text/javascript">
+      let eSource = new EventSource("/listen");
+      eSource.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        if(data.running === 'True') {
+          document.getElementById("current_time").style.color = "green";
+        } else {
+          document.getElementById("current_time").style.color = "black";
+        }
+        // check if data is valid
+        if (data.total_distance) {
+          document.getElementById("total_distance").innerHTML = data.total_distance;
+          document.getElementById("total_time").innerHTML = data.total_time;
+          document.getElementById("total_strokes").innerHTML = data.total_strokes;
+          document.getElementById("spm").innerHTML = data.spm;
+          document.getElementById("time_500m").innerHTML = data.time_500m;
+          document.getElementById("average_spm").innerHTML = data.average_spm;
+          document.getElementById("average_500m").innerHTML = data.average_500m;
+          document.getElementById("last_stroke_forward").innerHTML = data.last_stroke_forward;
+          document.getElementById("last_stroke_backward").innerHTML = data.last_stroke_backward;
+          document.getElementById("last_stroke_total").innerHTML = data.last_stroke_total;
+          document.getElementById("last_stroke_distance").innerHTML = data.last_stroke_distance;
+        }
+      };
+      eSource.onerror = function (err) {
+        document.getElementById("error").innerHTML = "Error loading data. ";
+      };
+
+      function refreshTime() {
+        const timeDisplay = document.getElementById("current_time");
+        const dateString = new Date().toLocaleString();
+        const formattedString = dateString
+          .replace(", ", " - ")
+          .replaceAll("/", ".");
+        timeDisplay.textContent = formattedString;
+      }
+      setInterval(refreshTime, 1000);
+
+      function xhr(page) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", page, true);
+        xhr.send();
+      }
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <main>
+        <div class="row">
+          <div class="col-sm">
+            <h1>Rower</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <button class="btn btn-primary" onclick="xhr('/start')" role="button">Start</button>
+          </div>
+          <div class="col-sm">
+            <button class="btn btn-primary" onclick="xhr('/stop')" role="button">Stop</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span class="display-4" id="current_time"></span>
+          </div>
+          <div class="col-sm">
+            <span>Total time</span>
+            <span class="display-4" id="total_time"></span>
+            <span>seconds</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>Current SPM (last 5 strokes)</span>
+            <span class="display-2" id="spm"></span>
+          </div>
+          <div class="col-sm">
+            <span>Current 500m</span>
+            <span class="display-2" id="time_500m"></span>
+            <span>seconds (last 5 strokes)</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>Average SPM</span>
+            <span class="display-2" id="average_spm"></span>
+          </div>
+          <div class="col-sm">
+            <span>Average 500m</span>
+            <span class="display-2" id="average_500m"></span>
+            <span>seconds</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>Total strokes</span>
+            <span class="display-2" id="total_strokes"></span>
+          </div>
+          <div class="col-sm">
+            <span>Total Distance</span>
+            <span class="display-2" id="total_distance"></span>
+            <span>meters</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>Forward</span>
+            <span class="display-4" id="last_stroke_forward"></span>
+            <span>seconds</span>
+          </div>
+          <div class="col-sm">
+            <span>Backward</span>
+            <span class="display-4" id="last_stroke_backward"></span>
+            <span>seconds</span>
+          </div>
+          <div class="col-sm">
+            <span>Total</span>
+            <span class="display-4" id="last_stroke_total"></span>
+            <span>seconds</span>
+          </div>
+          <div class="col-sm">
+            <span>Distance</span>
+            <span class="display-4" id="last_stroke_distance"></span>
+            <span>meters</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span class="error" id="error"></span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
