@@ -1,10 +1,7 @@
 # Raspiberry PI Rower
 
 ## Description
-I had purchased a rowing machine. Unfortunately, the machine did not calculate some values correctly, such as average Strokes Per Minute. 
-Since I had a Raspiberry PI and an ultrasonic sensor left, I thought I would try to build this myself. 
-
-_The result is the RP Rower._
+I had purchased a rowing machine. Unfortunately, the machine did not calculate some values correctly, such as average Strokes Per Minute. Since I had a Raspberry PI and an ultrasonic sensor left, I thought I would try to build this myself. _The result is the RP Rower._
 
 Of course, not all values can be calculated exactly, such as the distance per stroke, but the curiosity was aroused in me to try it out.
 
@@ -23,7 +20,7 @@ Of course, not all values can be calculated exactly, such as the distance per st
 - Maybe you have to adapt the constant ```FACTOR_DISTANCE``` in the file ```rower.py```. This is used to convert the distance measured by the sensor to the distance of the stroke. As said, the distance value can only give a rough indication.
 
 ## Running
-- Start the rower with ```python3 rower.py```
+- Start the RP Rower with ```python3 rower.py```
 
 ## User Interface
 - Connect with a device like a tablet to the rower, the server is running on port ```5000```.
