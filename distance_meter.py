@@ -1,7 +1,6 @@
 from threading import Thread
 from eventhandler import EventHandler
 from time import sleep, time, time_ns
-import logging
 import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BCM)
@@ -9,9 +8,6 @@ GPIO_TRIGGER = 23
 GPIO_ECHO = 24
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
-
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
 
 # Ignore small changes
 INACCURACY = 2
@@ -62,7 +58,7 @@ class DistanceMeter(Thread):
 
         pulse_duration = pulse_end_time - pulse_start_time
         d = round(pulse_duration * 17150, 2)
-        logging.debug("%s", d)
+        #print("%s", d)
         return d
 
     def run(self):
@@ -92,10 +88,10 @@ class DistanceMeter(Thread):
                     # It seems it is going into the other direction
                     # but to handle incorrect numbers, we only fire the event if the 3rd value is smaller
                     if self.new_direction_count < 2:
-                        logging.debug('r_b: %s', self.new_direction_count)
+                        #print('r_b: %s', self.new_direction_count)
                         self.new_direction_count = self.new_direction_count + 1
                     else:
-                        logging.debug('>>> r_b %s', self.distance)
+                        #print('>>> r_b %s', self.distance)
                         self.new_direction_count = 0
                         self.event_handler.fire('r_b', self.distance, self.last_time)
                         self.forward = False
@@ -107,10 +103,10 @@ class DistanceMeter(Thread):
                     self.last_time = time_ns()
                 elif d > (self.distance + INACCURACY):
                     if self.new_direction_count < 2:
-                        logging.debug('r_f: %s', self.new_direction_count)
+                        #print('r_f: %s', self.new_direction_count)
                         self.new_direction_count = self.new_direction_count + 1
                     else:
-                        logging.debug('>>> r_f %s', self.distance)
+                        #print('>>> r_f %s', self.distance)
                         self.new_direction_count = 0
                         self.event_handler.fire('r_f', self.distance, self.last_time)
                         self.forward = True

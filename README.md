@@ -25,3 +25,6 @@ Of course, not all values can be calculated exactly, such as the distance per st
 ## User Interface
 - Connect with a device like a tablet to the rower, the server is running on port ```5000```.
 - Click on Start button and start rowing :-) 
+
+## Ideas to improve
+- Show charts with the data.

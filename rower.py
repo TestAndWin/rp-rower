@@ -7,6 +7,8 @@ import numpy as np
 
 FACTOR_DISTANCE = 0.15
 """The factor to multiply the distance with to get the appr. distance of a stroke"""
+MIN_STROKE_DISTANCE = 3
+"""Used to prevent unlogic distance changes"""
 NANO_TO_SECOND = 1000000000
 
 
@@ -46,6 +48,11 @@ class Rower:
         Handling the forward direction change.
         The values are calculated and the event is added to queue to be send to the connection the client can open with the listen endpoint.
         """
+        
+        if self.distance < MIN_STROKE_DISTANCE:
+            print("Ignore this stroke with distance: ", self.distance)
+            return
+        
         # nothing to calculate when we start
         if self.total_strokes > 0:
             # Store the values from the stroke
@@ -81,7 +88,7 @@ class Rower:
         # Prepare the event data
         d = {
             'total_distance': round(self.total_distance, 1),
-            'total_time': round(total_time, 1),
+            'total_time': sec_to_min(total_time),
             'total_strokes': self.total_strokes,
             'last_stroke_forward': round(t_forward, 1),
             'last_stroke_backward': round(t_backward, 1),
@@ -91,12 +98,15 @@ class Rower:
             'spm': round(l / last_5_total_time * 60, 1),
             'average_spm': round(self.total_strokes / total_time * 60, 1),
             # e.g. 760m = 150 secs, 500m = n secs
-            'time_500m': round(last_5_total_time / last_5_total_distance * 500, 1),
-            'average_500m': round(total_time / self.total_distance * 500, 1),
+            'time_500m': sec_to_min(last_5_total_time / last_5_total_distance * 500),
+            'average_500m': sec_to_min(total_time / self.total_distance * 500),
             'running': self.running
         }
         return d
 
+def sec_to_min(sec):
+    """Convert seconds to minutes"""
+    return str(int(sec / 60)) + ":" + str(int(sec % 60)).zfill(2)
 
 class MessageAnnouncer:
     """
