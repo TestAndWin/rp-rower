@@ -1,0 +1,4 @@
+eventhandler
+Flask
+numpy
+RPi.GPIO
