@@ -9,11 +9,6 @@
       let eSource = new EventSource("/listen");
       eSource.onmessage = function (event) {
         const data = JSON.parse(event.data);
-        if(data.running === 'True') {
-          document.getElementById("current_time").style.color = "green";
-        } else {
-          document.getElementById("current_time").style.color = "black";
-        }
         // check if data is valid
         if (data.total_distance) {
           document.getElementById("total_distance").innerHTML = data.total_distance;
@@ -35,11 +30,8 @@
 
       function refreshTime() {
         const timeDisplay = document.getElementById("current_time");
-        const dateString = new Date().toLocaleString();
-        const formattedString = dateString
-          .replace(", ", " - ")
-          .replaceAll("/", ".");
-        timeDisplay.textContent = formattedString;
+        const now = new Date();
+        timeDisplay.textContent = now.toLocaleTimeString('de-DE');
       }
       setInterval(refreshTime, 1000);
 
@@ -47,6 +39,13 @@
         const xhr = new XMLHttpRequest();
         xhr.open("GET", page, true);
         xhr.send();
+        if(page.indexOf("start") > -1) {
+          document.getElementById("b_start").style.display = "none";
+          document.getElementById("b_stop").style.display = "block";
+        } else {
+          document.getElementById("b_start").style.display = "block";
+          document.getElementById("b_stop").style.display = "none";
+        }
       }
     </script>
     <link
@@ -67,53 +66,78 @@
         </div>
         <div class="row">
           <div class="col-sm">
-            <button class="btn btn-primary" onclick="xhr('/start')" role="button">Start</button>
-          </div>
-          <div class="col-sm">
-            <button class="btn btn-primary" onclick="xhr('/stop')" role="button">Stop</button>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm">
             <span class="display-4" id="current_time"></span>
           </div>
           <div class="col-sm">
+            <button id="b_start" class="btn btn-primary" onclick="xhr('/start')" role="button">Start</button>
+            <button id="b_stop" class="btn btn-primary" onclick="xhr('/stop')" role="button" style="display: none">Stop</button>
+          </div>
+          <div class="col-sm">
             <span>Total time</span>
+          </div>
+          <div class="col-sm">
             <span class="display-4" id="total_time"></span>
             <span>mins</span>
           </div>
         </div>
         <div class="row">
           <div class="col-sm">
-            <span>Current SPM (last 5 strokes)</span>
-            <span class="display-2" id="spm"></span>
-          </div>
-          <div class="col-sm">
-            <span>Current 500m</span>
-            <span class="display-2" id="time_500m"></span>
-            <span>mins (last 5 strokes)</span>
+            <span>Last 5 Strokes</span>
           </div>
         </div>
         <div class="row">
           <div class="col-sm">
-            <span>Average SPM</span>
-            <span class="display-2" id="average_spm"></span>
+            <span>SPM</span>
           </div>
           <div class="col-sm">
-            <span>Average 500m</span>
-            <span class="display-2" id="average_500m"></span>
+            <span class="display-3" id="spm"></span>
+          </div>
+          <div class="col-sm">
+            <span>500m</span>
+          </div>
+          <div class="col-sm">
+            <span class="display-3" id="time_500m"></span>
             <span>mins</span>
           </div>
         </div>
         <div class="row">
           <div class="col-sm">
-            <span>Total strokes</span>
-            <span class="display-2" id="total_strokes"></span>
+            <span>Average</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>SPM</span>
           </div>
           <div class="col-sm">
-            <span>Total Distance</span>
-            <span class="display-2" id="total_distance"></span>
-            <span>meters</span>
+            <span class="display-3" id="average_spm"></span>
+          </div>
+          <div class="col-sm">
+            <span>500m</span>
+          </div>
+          <div class="col-sm">
+            <span class="display-3" id="average_500m"></span>
+            <span>mins</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>Total</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            <span>Strokes</span>
+          </div>
+          <div class="col-sm">
+            <span class="display-3" id="total_strokes"></span>
+          </div>
+          <div class="col-sm">
+            <span>Distance</span>
+          </div>
+          <div class="col-sm">
+            <span class="display-3" id="total_distance"></span>
+            <span>m</span>
           </div>
         </div>
         <div class="row">
@@ -123,24 +147,23 @@
         </div>
         <div class="row">
           <div class="col-sm">
-            <span>Forward</span>
-            <span class="display-4" id="last_stroke_forward"></span>
-            <span>seconds</span>
+            <span>Time</span>
           </div>
           <div class="col-sm">
-            <span>Backward</span>
-            <span class="display-4" id="last_stroke_backward"></span>
-            <span>seconds</span>
-          </div>
-          <div class="col-sm">
-            <span>Total</span>
             <span class="display-4" id="last_stroke_total"></span>
-            <span>seconds</span>
+            (
+            <span class="display-5" id="last_stroke_forward"></span>
+            /
+            <span class="display-5" id="last_stroke_backward"></span>
+            )
+            <span>secs</span>
           </div>
           <div class="col-sm">
             <span>Distance</span>
+          </div>
+          <div class="col-sm">
             <span class="display-4" id="last_stroke_distance"></span>
-            <span>meters</span>
+            <span>m</span>
           </div>
         </div>
         <div class="row">
