@@ -36,6 +36,7 @@ class Rower:
         """Start the rower"""
         self.dm.start_meter()
         self.running = True
+        self.start_forward_time = time_ns()
         announcer.announce(msg=f'data: {"{}"}\n\n')
 
     def stop(self):
@@ -48,22 +49,20 @@ class Rower:
         Handling the forward direction change.
         The values are calculated and the event is added to queue to be send to the connection the client can open with the listen endpoint.
         """
-        
-        if self.distance < MIN_STROKE_DISTANCE:
-            print("Ignore this stroke with distance: ", self.distance)
-            return
-        
-        # nothing to calculate when we start
-        if self.total_strokes > 0:
-            # Store the values from the stroke
-            t_forward = round((self.start_backward_time - self.start_forward_time) / NANO_TO_SECOND, 3)
-            t_backward = round((time_in_ns - self.start_backward_time) / NANO_TO_SECOND, 3)
-            # stroke | distance | time forward | time backward
-            self.strokes.append([self.total_strokes, self.distance, t_forward, t_backward])
 
-            # Add latest data to the queue and
-            # event expects data field and two line breaks
-            announcer.announce(msg=f'data: {json.dumps(self.calculate_data(t_forward, t_backward))}\n\n')
+        if self.distance < MIN_STROKE_DISTANCE:
+            print("Ignore this stroke with distance:", self.distance)
+            return
+
+        # Store the values from the stroke
+        t_forward = round((self.start_backward_time - self.start_forward_time) / NANO_TO_SECOND, 3)
+        t_backward = round((time_in_ns - self.start_backward_time) / NANO_TO_SECOND, 3)
+        # stroke | distance | time forward | time backward
+        self.strokes.append([self.total_strokes, self.distance, t_forward, t_backward])
+
+        # Add latest data to the queue and
+        # event expects data field and two line breaks
+        announcer.announce(msg=f'data: {json.dumps(self.calculate_data(t_forward, t_backward))}\n\n')
 
         # Collect values for the next stroke
         self.total_strokes += 1
@@ -108,9 +107,11 @@ class Rower:
         print("Distance:", self.distance)
         return d
 
+
 def sec_to_min(sec):
     """Convert seconds to minutes"""
     return str(int(sec / 60)) + ":" + str(int(sec % 60)).zfill(2)
+
 
 class MessageAnnouncer:
     """
