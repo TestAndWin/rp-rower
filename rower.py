@@ -7,7 +7,7 @@ import numpy as np
 
 FACTOR_DISTANCE = 0.15
 """The factor to multiply the distance with to get the appr. distance of a stroke"""
-MIN_STROKE_DISTANCE = 2
+MIN_STROKE_DISTANCE = 1
 """Used to prevent unlogic distance changes"""
 NANO_TO_SECOND = 1000000000
 
@@ -52,9 +52,11 @@ class Rower:
 
         if self.distance < MIN_STROKE_DISTANCE:
             print("Ignore this stroke with distance:", self.distance)
+            self.start_forward_distance = self.dm.get_distance()
             return
 
         # Store the values from the stroke
+        self.total_strokes += 1
         t_forward = round((self.start_backward_time - self.start_forward_time) / NANO_TO_SECOND, 3)
         t_backward = round((time_in_ns - self.start_backward_time) / NANO_TO_SECOND, 3)
         # stroke | distance | time forward | time backward
@@ -65,7 +67,6 @@ class Rower:
         announcer.announce(msg=f'data: {json.dumps(self.calculate_data(t_forward, t_backward))}\n\n')
 
         # Collect values for the next stroke
-        self.total_strokes += 1
         self.start_forward_distance = distance
         self.start_forward_time = time_in_ns
 
@@ -73,9 +74,6 @@ class Rower:
         """Handling the backward direction change. Just some values are stored"""
         self.start_backward_time = time_in_ns
         self.distance = (distance - self.start_forward_distance) * FACTOR_DISTANCE
-        # In case something weird happens, we don't want to have a negative distance
-        if self.distance < 0:
-            self.distance = 0
 
     def calculate_data(self, t_forward, t_backward):
         """Caluclate the different metrics based on the numbers and return an JSON object with the values"""
