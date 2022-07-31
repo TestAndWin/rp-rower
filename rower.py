@@ -5,9 +5,9 @@ import queue
 import json
 import numpy as np
 
-FACTOR_DISTANCE = 0.15
+FACTOR_DISTANCE = 0.149
 """The factor to multiply the distance with to get the appr. distance of a stroke"""
-MIN_STROKE_DISTANCE = 1
+MIN_STROKE_DISTANCE = 0.4
 """Used to prevent unlogic distance changes"""
 NANO_TO_SECOND = 1000000000
 
@@ -74,6 +74,9 @@ class Rower:
         """Handling the backward direction change. Just some values are stored"""
         self.start_backward_time = time_in_ns
         self.distance = (distance - self.start_forward_distance) * FACTOR_DISTANCE
+        # In case something weird happens, we don't want to have a negative distance
+        if self.distance < 0:
+            self.distance = 0
 
     def calculate_data(self, t_forward, t_backward):
         """Caluclate the different metrics based on the numbers and return an JSON object with the values"""
